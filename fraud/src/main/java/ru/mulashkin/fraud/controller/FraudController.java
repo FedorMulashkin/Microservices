@@ -3,8 +3,8 @@ package ru.mulashkin.fraud.controller;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.mulashkin.clients.fraud.FraudCheckResponse;
 import ru.mulashkin.fraud.service.FraudCheckService;
-import ru.mulashkin.fraud.util.FraudCheckResponse;
 
 @RestController
 @RequestMapping("/api/v1/fraud-check")
