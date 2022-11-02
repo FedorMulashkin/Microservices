@@ -3,6 +3,7 @@ package ru.mulashkin.customer.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import ru.mulashkin.amqp.RabbitMQMessageProducer;
 import ru.mulashkin.clients.fraud.FraudCheckResponse;
 import ru.mulashkin.clients.fraud.FraudClient;
 import ru.mulashkin.clients.notification.NotificationClient;
@@ -18,7 +19,7 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final FraudClient fraudClient;
-    private final NotificationClient notificationClient;
+    private final RabbitMQMessageProducer rabbitMQMessageProducer;
 
     public void registerCustomer(CustomerRegistrationRequest customerRequest) {
         Customer customer = Customer.builder()
@@ -38,10 +39,11 @@ public class CustomerService {
                 customer.getId(),
                 customer.getFirstName(),
                 "hi");
-        notificationClient.sendNotification(notificationRequest);
+        rabbitMQMessageProducer.publish(notificationRequest,
+                "internal.exchange",
+                "internal.notification.routing-key");
         if (fraudCheckResponse.isFraudster()) {
             throw new IllegalStateException("Fraudster");
         }
-        // todo: send notification
     }
 }
